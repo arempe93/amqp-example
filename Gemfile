@@ -16,6 +16,7 @@ gem 'pg'
 
 # Mongo
 gem 'mongoid'
+gem 'bson'
 
 # User auth
 gem 'devise'

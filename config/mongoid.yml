@@ -17,4 +17,4 @@ test:
   <<: *default
   clients:
     default:
-      database: amqp__test_mongo
+      database: amqp_test_mongo

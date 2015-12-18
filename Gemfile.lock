@@ -200,6 +200,7 @@ PLATFORMS
 
 DEPENDENCIES
   annotate
+  bson
   bunny
   devise
   enumerate_it

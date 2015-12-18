@@ -3,8 +3,6 @@ default: &default
   host: localhost
   username: <%= ENV['PG_USER'] %>
   password: <%= ENV['PG_PASS'] %>
-  pool: 5
-  timeout: 5000
 
 development:
   <<: *default
