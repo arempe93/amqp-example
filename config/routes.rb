@@ -1,4 +1,4 @@
-Rails.routes.draw do
+AmqpExample::Application.routes.draw do
 
 	mount API::Base => '/'
 

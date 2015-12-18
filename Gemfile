@@ -14,6 +14,9 @@ gem 'grape-swagger-rails'
 # Database
 gem 'pg'
 
+# Mongo
+gem 'mongoid'
+
 # User auth
 gem 'devise'
 
