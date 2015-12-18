@@ -23,5 +23,9 @@ module AmqpExample
 
         # Do not swallow errors in after_commit/after_rollback callbacks.
         config.active_record.raise_in_transactional_callbacks = true
+
+        # Load Grape API files
+		config.paths.add 'app/api', glob: '**/*.rb'
+		config.autoload_paths += Dir["#{Rails.root}/app"]
     end
 end
