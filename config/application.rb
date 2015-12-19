@@ -27,5 +27,11 @@ module AmqpExample
         # Load Grape API files
 		config.paths.add 'app/api', glob: '**/*.rb'
 		config.autoload_paths += Dir["#{Rails.root}/app"]
+
+        # Use Postgresql for Rails models by default
+        config.generators do |g|
+            g.orm :active_record
+            g.test_framework :rspec
+        end
     end
 end
