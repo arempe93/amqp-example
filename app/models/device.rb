@@ -22,7 +22,10 @@ class Device < ActiveRecord::Base
 
     ## Callbacks
     before_create :hash_access_token
+    before_create :discover_os
     before_create :create_queue
+
+    after_destroy :teardown_queue
 
     ## Relationships
     belongs_to :user
@@ -40,13 +43,7 @@ class Device < ActiveRecord::Base
     def self.authenticate!(token)
 
         # find device for token
-        device = Device.find_by token_hash: Digest::MD5.hexdigest(token)
-
-        # raise exception if not found
-        raise ActiveRecord::RecordNotFound.new "Device not found with token => #{token}" unless device
-
-        # return device
-        device
+        Device.find_by! token_hash: Digest::MD5.hexdigest(token)
     end
 
     ## Private Methods
@@ -55,6 +52,15 @@ class Device < ActiveRecord::Base
 
         # md5 hash the auth token
         self.token_hash = Digest::MD5.hexdigest self.token_hash
+
+        # continue creation
+        true
+    end
+
+    def discover_os
+
+        # get os from user_agent
+        self.os = Enums::DeviceOS.from_user_agent self.user_agent
 
         # continue creation
         true
@@ -83,6 +89,22 @@ class Device < ActiveRecord::Base
 
             # continue creation
             true
+        end
+    end
+
+    def teardown_queue
+
+        begin
+
+            # remove from rmq
+            AMQP::Factory.teardown_queue self.amqp_queue
+
+        rescue => e
+
+            # log error
+            Rails.logger.error "#<Device id:#{self.id}>.teardown_queue raised => '#{e.message}'"
+            Rails.logger.error "#{e.backtrace}"
+
         end
     end
 end

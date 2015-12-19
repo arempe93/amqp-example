@@ -30,6 +30,7 @@ class User < ActiveRecord::Base
 
     ## Callbacks
     before_create :create_xhcg
+    after_destroy :teardown_xchg
 
     ## Validations
     validates :email, uniqueness: { case_sensitive: false }
@@ -62,6 +63,22 @@ class User < ActiveRecord::Base
 
             # continue creation
             true
+        end
+    end
+
+    def teardown_xchg
+
+        begin
+
+            # remove from rmq
+            AMQP::Factory.teardown_exchange self.amqp_xchg
+
+        rescue => e
+
+            # log error
+            Rails.logger.error "#<User id:#{self.id}>.teardown_xchg raised => '#{e.message}'"
+            Rails.logger.error "#{e.backtrace}"
+
         end
     end
 end
