@@ -11,10 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151219001103) do
+ActiveRecord::Schema.define(version: 20151219210046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "devices", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "uuid"
+    t.integer  "os"
+    t.boolean  "mobile"
+    t.string   "user_agent"
+    t.string   "amqp_queue"
+    t.string   "token_hash"
+    t.datetime "last_request"
+  end
+
+  add_index "devices", ["token_hash"], name: "index_devices_on_token_hash", unique: true, using: :btree
+  add_index "devices", ["user_id"], name: "index_devices_on_user_id", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
