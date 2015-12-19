@@ -18,7 +18,7 @@ class DeviseCreateUsers < ActiveRecord::Migration
             t.inet     :last_sign_in_ip
 
             ## RMQ
-            t.string :rmq_xchg
+            t.string :amqp_xchg
 
             t.timestamps null: false
         end
