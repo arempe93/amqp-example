@@ -4,7 +4,7 @@ module Enums
         ## Enumeration
         associate_values(
             windows: [1, 'Windows'],
-            mac: [2, 'Macintosh OSX'],
+            mac: [2, 'Macintosh'],
             linux: [3, 'Linux'],
             android: [4, 'Android'],
             ios: [5, 'iOS'],

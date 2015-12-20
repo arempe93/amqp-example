@@ -69,7 +69,7 @@ class Device < ActiveRecord::Base
     def create_queue
 
         # generate queue name
-        self.amqp_queue = "queue.#{self.user.id}.#{self.mobile}.#{Enums::DeviceOS.t(self.os)}.#{self.uuid.split('-')[0]}"
+        self.amqp_queue = "queue.#{self.user.id}.#{self.mobile}.#{Enums::DeviceOS.t(self.os).downcase}.#{self.uuid.split('-')[0]}"
 
         begin
 
