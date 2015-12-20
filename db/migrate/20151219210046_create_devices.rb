@@ -19,7 +19,7 @@ class CreateDevices < ActiveRecord::Migration
             t.datetime :last_request
         end
 
-        add_index :devices, :user_id,               unique: true
-        add_index :devices, :token_hash,       unique: true
+        add_index :devices, :user_id,           unique: false
+        add_index :devices, :token_hash,        unique: true
     end
 end

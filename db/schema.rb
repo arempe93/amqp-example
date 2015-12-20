@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20151219234703) do
   end
 
   add_index "devices", ["token_hash"], name: "index_devices_on_token_hash", unique: true, using: :btree
-  add_index "devices", ["user_id"], name: "index_devices_on_user_id", unique: true, using: :btree
+  add_index "devices", ["user_id"], name: "index_devices_on_user_id", unique: false, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
