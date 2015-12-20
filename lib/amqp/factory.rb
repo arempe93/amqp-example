@@ -1,7 +1,10 @@
 require 'bunny'
 
 module AMQP
-    class Factory
+    module Factory
+
+		## Connection, can be mocked for tests
+		mattr_accessor :connection
 
         ####################################################
         #   Connection Management
@@ -10,7 +13,7 @@ module AMQP
         def self.connect
 
             # create bunny rmq client
-            @connection = Bunny.new
+            @connection = Bunny.new Global.amqp.to_hash
 
             # make connection
             @connection.start
