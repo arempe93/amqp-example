@@ -15,11 +15,14 @@
 #  amqp_xchg              :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  username               :string
+#  name                   :string
 #
 # Indexes
 #
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_username              (username) UNIQUE
 #
 
 require 'rails_helper'

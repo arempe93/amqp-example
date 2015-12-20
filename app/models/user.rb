@@ -15,11 +15,14 @@
 #  amqp_xchg              :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  username               :string
+#  name                   :string
 #
 # Indexes
 #
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_username              (username) UNIQUE
 #
 
 class User < ActiveRecord::Base
@@ -34,6 +37,8 @@ class User < ActiveRecord::Base
 
     ## Validations
     validates :email, uniqueness: { case_sensitive: false }
+    validates :username, uniqueness: { case_sensitive: true }, format: { with: /\A\w{3,12}\Z/ }
+    validates :name, format: { with: /\A([a-z]+\s?)+\Z/ }
 
     ## Relationships
     has_many :devices
