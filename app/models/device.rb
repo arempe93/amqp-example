@@ -43,7 +43,7 @@ class Device < ActiveRecord::Base
     def self.authenticate!(token)
 
         # find device for token
-        Device.find_by! token_hash: Digest::MD5.hexdigest(token)
+        Device.find_by! token_hash: Digest::SHA256.hexdigest(token)
     end
 
     ## Private Methods
@@ -51,7 +51,7 @@ class Device < ActiveRecord::Base
     def hash_access_token
 
         # md5 hash the auth token
-        self.token_hash = Digest::MD5.hexdigest self.token_hash
+        self.token_hash = Digest::SHA256.hexdigest self.token_hash
 
         # continue creation
         true
@@ -69,7 +69,7 @@ class Device < ActiveRecord::Base
     def create_queue
 
         # generate queue name
-        self.amqp_queue = "queue.#{self.user.id}.#{self.mobile}.#{Enums::DeviceOS.t(self.os).downcase}.#{self.uuid.split('-')[0]}"
+        self.amqp_queue = "queue.#{self.user.username}.#{self.mobile}.#{Enums::DeviceOS.t(self.os).downcase}.#{self.uuid.split('-')[0]}"
 
         begin
 
@@ -79,7 +79,7 @@ class Device < ActiveRecord::Base
         rescue => e
 
             # log error
-            Rails.logger.error "#<Device id:#{self.id}>.create_queue raised => '#{e.message}'"
+            Rails.logger.error "Device.create_queue raised => '#{e.message}'"
             Rails.logger.error "#{e.backtrace}"
 
             # bubble up call stack

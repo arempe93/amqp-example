@@ -32,7 +32,7 @@ module AMQP
         #   Exchange Management
         ####################################################
 
-        def self.create_exchange(name, opts = {})
+        def self.create_exchange(name)
 
             begin
 
@@ -40,7 +40,7 @@ module AMQP
                 channel = get_channel
 
                 # create exchange
-                channel.fanout name, opts
+                channel.fanout name, durable: true
 
             rescue => e
 
@@ -58,7 +58,7 @@ module AMQP
             end
         end
 
-        def self.teardown_exchange(name, opts = {})
+        def self.teardown_exchange(name)
 
             begin
 
@@ -66,7 +66,7 @@ module AMQP
                 channel = get_channel
 
                 # get exchange
-                xchg = channel.fanout name, opts
+                xchg = channel.fanout name, durable: true
 
                 # teardown exchange
                 xchg.delete
@@ -91,13 +91,7 @@ module AMQP
         #   Binding Management
         ####################################################
 
-        def self.bind_exchange(source_name, receiver_name, opts = {})
-
-            # get source options
-            source_opts = opts[:source] || {}
-
-            # get receiver options
-            receiver_opts = opts[:receiver] || {}
+        def self.bind_exchange(source_name, receiver_name)
 
             begin
 
@@ -105,10 +99,10 @@ module AMQP
                 channel = get_channel
 
                 # get source exchange
-                source = channel.fanout source_name, source_opts
+                source = channel.fanout source_name, durable: true
 
                 # bind receiver to source
-                source.bind receiver_name, routing_key: receiver_name, arguments: receiver_opts
+                source.bind receiver_name, routing_key: receiver_name
 
             rescue => e
 
@@ -126,13 +120,7 @@ module AMQP
             end
         end
 
-        def self.unbind_exchange(source_name, receiver_name, opts = {})
-
-            # get source options
-            source_opts = opts[:source] || {}
-
-            # get receiver options
-            receiver_opts = opts[:receiver] || {}
+        def self.unbind_exchange(source_name, receiver_name)
 
             begin
 
@@ -140,10 +128,10 @@ module AMQP
                 channel = get_channel
 
                 # get source exchange
-                source = channel.fanout source_name, source_opts
+                source = channel.fanout source_name, durable: true
 
                 # unbind receiver from source
-                source.unbind receiver_name, routing_key: receiver_name, arguments: receiver_opts
+                source.unbind receiver_name, routing_key: receiver_name
 
             rescue => e
 
@@ -165,7 +153,7 @@ module AMQP
         #   Queue Management
         ####################################################
 
-        def self.create_queue(name, xchg_name, opts = {})
+        def self.create_queue(name, xchg_name)
 
             begin
 
@@ -173,7 +161,7 @@ module AMQP
                 channel = get_channel
 
                 # get exchange to create in
-                xchg = channel.fanout xchg_name, opts
+                xchg = channel.fanout xchg_name,durable: true
 
                 # create queue
                 queue = channel.queue name
@@ -241,7 +229,7 @@ module AMQP
                 channel = get_channel
 
                 # get exchange
-                xchg = channel.fanout xchg_name
+                xchg = channel.fanout xchg_name, durable: true
 
                 # publish message
                 xchg.publish message.to_json, opts

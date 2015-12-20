@@ -48,17 +48,17 @@ class User < ActiveRecord::Base
     def create_xhcg
 
         # generate exchange name
-        self.amqp_xchg = "xchg.user.#{self.id}"
+        self.amqp_xchg = "xchg.user.#{self.username}"
 
         begin
 
             # create in rmq
-            AMQP::Factory.create_exchange self.amqp_xchg, durable: true
+            AMQP::Factory.create_exchange self.amqp_xchg
 
         rescue => e
 
             # log error
-            Rails.logger.error "#<User id:#{self.id}>.create_xchg raised => '#{e.message}'"
+            Rails.logger.error "User.create_xchg raised => '#{e.message}'"
             Rails.logger.error "#{e.backtrace}"
 
             # bubble up call stack
