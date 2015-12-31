@@ -26,8 +26,10 @@
 #
 
 FactoryGirl.define do
-  factory :user do
-    
-  end
-
+    factory :user do
+        name Faker::Name.name
+        username Faker::Internet.user_name
+        email Faker::Internet.safe_email
+        password SecureRandom.hex(8)
+    end
 end

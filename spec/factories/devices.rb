@@ -19,8 +19,11 @@
 #
 
 FactoryGirl.define do
-  factory :device do
-    
-  end
-
+    factory :device do
+        user nil
+        uuid SecureRandom.uuid
+        mobile false
+        user_agent 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
+        token_hash SecureRandom.urlsafe_base64(24)
+    end
 end

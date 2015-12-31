@@ -31,18 +31,24 @@ gem 'bunny'
 gem 'global'
 
 group :development, :test do
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
 
-  # Testing
-  gem 'rspec'
-  gem 'rspec-rails'
-  gem 'rack-test'
-  gem 'factory_girl_rails', '~> 4.0'
+  # Spring
+  gem 'spring'
 
   # Model Sanity
   gem 'annotate'
+end
 
-  # Seeding information
-  gem 'faker'
+group :test do
+
+    # Rspec
+    gem 'rspec'
+    gem 'rspec-rails'
+    gem 'rack-test'
+
+    # Model factories
+    gem 'factory_girl_rails', '~> 4.0'
+
+    # Seeding information
+    gem 'faker'
 end
