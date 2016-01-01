@@ -11,18 +11,18 @@
 class Feed < ActiveRecord::Base
 
 	## Callbacks
-	before_create :create_xhcg
+	after_create :create_xhcg
     after_destroy :teardown_xchg
 
 	## Validations
-	validates :name, uniqueness: { case_sensitive: true }, format: { with: /\A\w{3,}\Z/ }
+	validates :name, uniqueness: { case_sensitive: true }, format: { with: /\A(([a-z]|'|\.)+\s?)+\Z/i }
 
 	## Private Methods
     private
     def create_xhcg
 
         # generate exchange name
-        self.amqp_xchg = "xchg.feed.#{self.name}.#{self.id}"
+        self.amqp_xchg = "xchg.feed.#{self.id}"
 
         begin
 
@@ -40,8 +40,8 @@ class Feed < ActiveRecord::Base
 
         else
 
-            # continue creation
-            true
+            # save exchange name
+            self.save!
         end
     end
 

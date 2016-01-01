@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
         :recoverable, :trackable, :validatable
 
     ## Callbacks
-    before_create :create_xhcg
+    after_create :create_xhcg
     after_destroy :teardown_xchg
 
     ## Validations
@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
     def create_xhcg
 
         # generate exchange name
-        self.amqp_xchg = "xchg.user.#{self.username.gsub('.', '_')}"
+        self.amqp_xchg = "xchg.user.#{self.id}"
 
         begin
 
@@ -66,8 +66,8 @@ class User < ActiveRecord::Base
 
         else
 
-            # continue creation
-            true
+            # save exchange name
+            self.save!
         end
     end
 

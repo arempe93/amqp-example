@@ -4,8 +4,8 @@
 
 puts 'Deleting amqp exchanges and queues...'
 
-`rabbitmqadmin -f tsv list exchanges name | grep ^xchg | while read xchg; do rabbitmqadmin -q delete exchange name=${xchg}; done`
-`rabbitmqadmin -f tsv list queues name | grep ^queue | while read q; do rabbitmqadmin -q delete queue name=${q}; done`
+`rabbitmqadmin -f tsv list exchanges name | grep ^xchg | while read xchg; do rabbitmqadmin -q delete exchange name="${xchg}"; done`
+`rabbitmqadmin -f tsv list queues name | grep ^queue | while read q; do rabbitmqadmin -q delete queue name="${q}"; done`
 
 puts '[x] DONE'
 
@@ -58,5 +58,27 @@ end
 puts '[x] Done'
 
 ##
+##	Create feeds
 ##
-##
+
+private_feeds	= Array.new
+group_feeds 	= Array.new
+
+puts 'Creating feeds...'
+
+5.times do
+
+	feed_type = Enums::FeedType.list.sample
+	feed = Feed.create! name: Faker::Lorem.sentence, feed_type: feed_type
+
+	if feed_type == Enums::FeedType::PRIVATE
+
+		private_feeds << feed
+
+	else
+
+		group_feeds << feed
+	end
+end
+
+puts '[x] Done'

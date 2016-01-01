@@ -23,8 +23,8 @@ class Device < ActiveRecord::Base
     ## Callbacks
     before_create :hash_access_token
     before_create :discover_os
-    before_create :create_queue
 
+    after_create :create_queue
     after_destroy :teardown_queue
 
     ## Validations
@@ -72,7 +72,7 @@ class Device < ActiveRecord::Base
     def create_queue
 
         # generate queue name
-        self.amqp_queue = "queue.device.#{self.mobile}.#{self.uuid}"
+        self.amqp_queue = "queue.device.#{self.id}.#{self.mobile}"
 
         begin
 
@@ -90,8 +90,8 @@ class Device < ActiveRecord::Base
 
         else
 
-            # continue creation
-            true
+            # save queue name
+            self.save!
         end
     end
 
