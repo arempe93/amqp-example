@@ -7,6 +7,10 @@
 #  feed_type :integer          not null
 #  amqp_xchg :string
 #
+# Indexes
+#
+#  index_feeds_on_name  (name) UNIQUE
+#
 
 require 'rails_helper'
 
