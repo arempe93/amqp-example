@@ -6,9 +6,6 @@ module AMQP
 		## Connection, can be mocked for tests
 		mattr_accessor :connection
 
-        ## Channel id
-        CHANNEL_IDENTIFIER = 1
-
         ####################################################
         #   Connection Management
         ####################################################
@@ -31,7 +28,7 @@ module AMQP
             connect unless defined?(@connection) and @connection.open?
 
             # get channel
-            @connection.channel CHANNEL_IDENTIFIER
+            @connection.channel
         end
 
         ####################################################

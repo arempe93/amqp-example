@@ -27,6 +27,9 @@ class Device < ActiveRecord::Base
 
     after_destroy :teardown_queue
 
+    ## Validations
+    validates :uuid, format: { with: /\A([abcdef0-9]+\-?)+\Z/ }
+
     ## Relationships
     belongs_to :user
 
@@ -69,7 +72,7 @@ class Device < ActiveRecord::Base
     def create_queue
 
         # generate queue name
-        self.amqp_queue = "queue.#{self.user.username}.#{self.mobile}.#{Enums::DeviceOS.t(self.os).downcase}.#{self.uuid.split('-')[0]}"
+        self.amqp_queue = "queue.device.#{self.mobile}.#{self.uuid}"
 
         begin
 

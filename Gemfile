@@ -33,6 +33,9 @@ group :development, :test do
 
   # Model Sanity
   gem 'annotate'
+
+  # Seeding information
+  gem 'faker'
 end
 
 group :test do
@@ -44,7 +47,4 @@ group :test do
 
     # Model factories
     gem 'factory_girl_rails', '~> 4.0'
-
-    # Seeding information
-    gem 'faker'
 end

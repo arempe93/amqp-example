@@ -5,5 +5,7 @@ class CreateFeeds < ActiveRecord::Migration
             t.integer :feed_type,   null: false
             t.string :amqp_xchg
         end
+
+        add_index :feeds, :name,   unique: true
     end
 end

@@ -36,6 +36,8 @@ ActiveRecord::Schema.define(version: 20160101203145) do
     t.string  "amqp_xchg"
   end
 
+  add_index "feeds", ["name"], name: "index_feeds_on_name", unique: true, using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
     t.string   "encrypted_password",     default: "", null: false

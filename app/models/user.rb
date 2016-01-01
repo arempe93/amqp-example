@@ -37,8 +37,8 @@ class User < ActiveRecord::Base
 
     ## Validations
     validates :email, uniqueness: { case_sensitive: false }
-    validates :username, uniqueness: { case_sensitive: true }, format: { with: /\A\w{3,}\Z/ }
-    validates :name, format: { with: /\A(([a-z]|')+\s?){1,4}\Z/i }
+    validates :username, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/ }
+    validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i }
 
     ## Relationships
     has_many :devices
@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
     def create_xhcg
 
         # generate exchange name
-        self.amqp_xchg = "xchg.user.#{self.username}"
+        self.amqp_xchg = "xchg.user.#{self.username.gsub('.', '_')}"
 
         begin
 
