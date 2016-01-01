@@ -15,7 +15,7 @@
 # Indexes
 #
 #  index_devices_on_token_hash  (token_hash) UNIQUE
-#  index_devices_on_user_id     (user_id) UNIQUE
+#  index_devices_on_user_id     (user_id)
 #
 
 FactoryGirl.define do

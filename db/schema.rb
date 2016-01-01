@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151219234703) do
+ActiveRecord::Schema.define(version: 20160101203145) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,7 +28,13 @@ ActiveRecord::Schema.define(version: 20151219234703) do
   end
 
   add_index "devices", ["token_hash"], name: "index_devices_on_token_hash", unique: true, using: :btree
-  add_index "devices", ["user_id"], name: "index_devices_on_user_id", unique: false, using: :btree
+  add_index "devices", ["user_id"], name: "index_devices_on_user_id", using: :btree
+
+  create_table "feeds", force: :cascade do |t|
+    t.string  "name",      null: false
+    t.integer "feed_type", null: false
+    t.string  "amqp_xchg"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false

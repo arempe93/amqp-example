@@ -31,11 +31,5 @@ module AmqpExample
 
         # Load amqp lib
         config.autoload_paths << Rails.root.join('lib')
-
-        # Use Postgresql for Rails models by default
-        config.generators do |g|
-            g.orm :active_record
-            g.test_framework :rspec
-        end
     end
 end
