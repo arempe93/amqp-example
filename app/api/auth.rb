@@ -28,10 +28,7 @@ module API
                 unauthorized! '401.1' unless user.valid_password?(params[:password])
 
                 # create device
-                device = Device.generate params[:device].to_hash
-
-                # add ownership of device
-                device.user = user
+                device = Device.generate params[:device].to_hash.merge({ user: user })
 
                 # get un-hashed auth token
                 auth_token = device.token_hash

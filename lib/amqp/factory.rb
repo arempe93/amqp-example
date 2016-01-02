@@ -110,7 +110,7 @@ module AMQP
             rescue => e
 
                 # log errors
-                Rails.logger.error "AMQP::Factory::bind_exchange raised => '#{e.message}'"
+                Rails.logger.error "AMQP::Factory::bind_exchange raised => #{e.class.name}: '#{e.message}'"
                 Rails.logger.error "(#{source_name}, #{receiver_name})"
                 Rails.logger.error "#{e.backtrace}"
 
