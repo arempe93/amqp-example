@@ -101,16 +101,17 @@ module AMQP
                 # get channel
                 channel = get_channel
 
-                # get source exchange
-                source = channel.fanout source_name, durable: true
+                # get receiver exchange
+                receiver = channel.fanout receiver_name, durable: true
 
                 # bind receiver to source
-                source.bind receiver_name, routing_key: receiver_name
+                receiver.bind source_name
 
             rescue => e
 
                 # log errors
                 Rails.logger.error "AMQP::Factory::bind_exchange raised => '#{e.message}'"
+                Rails.logger.error "(#{source_name}, #{receiver_name})"
                 Rails.logger.error "#{e.backtrace}"
 
                 # bubble up call stack
@@ -130,16 +131,17 @@ module AMQP
                 # get channel
                 channel = get_channel
 
-                # get source exchange
-                source = channel.fanout source_name, durable: true
+                # get receiver exchange
+                receiver = channel.fanout receiver_name, durable: true
 
                 # unbind receiver from source
-                source.unbind receiver_name, routing_key: receiver_name
+                receiver.unbind source_name
 
             rescue => e
 
                 # log errors
                 Rails.logger.error "AMQP::Factory::unbind_exchange raised => '#{e.message}'"
+                Rails.logger.error "(#{source_name}, #{receiver_name})"
                 Rails.logger.error "#{e.backtrace}"
 
                 # bubble up call stack

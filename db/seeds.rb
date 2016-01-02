@@ -82,3 +82,27 @@ puts 'Creating feeds...'
 end
 
 puts '[x] Done'
+
+##
+##	Create feed subscriptions
+##
+
+puts 'Creating subscriptions...'
+
+private_feeds.each do |feed|
+
+	User.all.to_a.sample(2).each do |user|
+
+		Subscription.create! user: user, feed: feed
+	end
+end
+
+group_feeds.each do |feed|
+
+	User.all.to_a.sample(rand(2..5)).each do |user|
+
+		Subscription.create! user: user, feed: feed
+	end
+end
+
+puts '[x] Done'
