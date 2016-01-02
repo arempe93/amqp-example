@@ -225,9 +225,6 @@ module AMQP
 
         def self.publish(message, xchg_name, opts = {})
 
-            # set content type of delivery
-            opts.merge! content_type: 'application/json'
-
             begin
 
                 # get channel

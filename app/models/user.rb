@@ -58,7 +58,7 @@ class User < ActiveRecord::Base
         rescue => e
 
             # log error
-            Rails.logger.error "User.create_xchg raised => '#{e.message}'"
+            Rails.logger.error "#<User id:#{self.id}>.create_xchg raised => '#{e.message}'"
             Rails.logger.error "#{e.backtrace}"
 
             # bubble up call stack

@@ -1,0 +1,29 @@
+# == Schema Information
+#
+# Table name: messages
+#
+#  id           :integer          not null, primary key
+#  user_id      :integer
+#  feed_id      :integer
+#  message_type :integer
+#  payload      :string
+#  options      :hstore
+#  sent_at      :datetime
+#
+# Indexes
+#
+#  index_messages_on_feed_id  (feed_id)
+#  index_messages_on_user_id  (user_id)
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined.  If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: {}
+# column: value
+#
+two: {}
+#  column: value

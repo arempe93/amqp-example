@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160101230537) do
+ActiveRecord::Schema.define(version: 20160102035955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "devices", force: :cascade do |t|
     t.integer  "user_id"
@@ -37,6 +38,18 @@ ActiveRecord::Schema.define(version: 20160101230537) do
   end
 
   add_index "feeds", ["name"], name: "index_feeds_on_name", unique: true, using: :btree
+
+  create_table "messages", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "feed_id"
+    t.integer  "message_type"
+    t.string   "payload"
+    t.hstore   "options"
+    t.datetime "sent_at"
+  end
+
+  add_index "messages", ["feed_id"], name: "index_messages_on_feed_id", using: :btree
+  add_index "messages", ["user_id"], name: "index_messages_on_user_id", using: :btree
 
   create_table "subscriptions", force: :cascade do |t|
     t.integer "user_id"

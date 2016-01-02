@@ -106,3 +106,19 @@ group_feeds.each do |feed|
 end
 
 puts '[x] Done'
+
+##
+##	Create messages
+##
+
+puts 'Creating messages...'
+
+Feed.all.each do |feed|
+
+	feed.subscribers.each do |user|
+
+		Message.create! feed: feed, sender: user, message_type: Enums::MessageType::CHAT, payload: Faker::Lorem.sentence
+	end
+end
+
+puts '[x] Done'

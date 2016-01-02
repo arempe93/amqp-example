@@ -21,6 +21,33 @@ class Feed < ActiveRecord::Base
 	## Validations
 	validates :name, uniqueness: { case_sensitive: true }, format: { with: /\A(([a-z]|'|\.)+\s?)+\Z/i }
 
+	## Relationships
+	has_many :subscriptions
+	has_many :subscribers, through: :subscriptions, source: :user
+
+	has_many :messages
+
+	## Methods
+	def publish(message)
+
+		begin
+
+			# publish message to exchange
+			AMQP::Factory.publish message.payload, self.amqp_xchg, message.options
+
+		rescue => e
+
+			# log error
+			Rails.logger.error "#<Feed id:#{self.id}>.publish raised => '#{e.message}'"
+			Rails.logger.error "(#<Message id:#{message.id}>)"
+            Rails.logger.error "#{e.backtrace}"
+
+			# bubble up call stack
+			raise
+
+		end
+	end
+
 	## Private Methods
     private
     def create_xhcg
@@ -36,7 +63,7 @@ class Feed < ActiveRecord::Base
         rescue => e
 
             # log error
-            Rails.logger.error "Feed.create_xchg raised => '#{e.message}'"
+            Rails.logger.error "#<Feed id:#{self.id}>.create_xchg raised => '#{e.message}'"
             Rails.logger.error "#{e.backtrace}"
 
             # bubble up call stack
