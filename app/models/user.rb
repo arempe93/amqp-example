@@ -43,6 +43,14 @@ class User < ActiveRecord::Base
     ## Relationships
     has_many :devices
 
+    has_many :subscriptions
+    has_many :feeds, through: :subscriptions, source: :feed
+
+    ## Methods
+    def subscribed_to?(feed)
+        self.subscriptions.exists? feed_id: feed.id
+    end
+
     ## Private Methods
     private
     def create_xhcg

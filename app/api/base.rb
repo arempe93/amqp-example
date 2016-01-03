@@ -19,6 +19,7 @@ module API
 
         mount Auth
         mount Users
+        mount Feeds
 
         add_swagger_documentation hide_format: true
     end

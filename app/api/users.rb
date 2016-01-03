@@ -73,6 +73,23 @@ module API
 				# present results
 				present :users, users
 			end
+
+			route_param :id do
+
+				desc 'Get user information'
+				params do
+					optional :auth_token, type: String
+				end
+				get do
+
+					# find user
+					user = User.find_by id: params[:id]
+					not_found! '404.1', 'User was not found' unless user
+
+					present :user, user
+				end
+
+			end
 		end
 	end
 end

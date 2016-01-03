@@ -25,7 +25,7 @@ class Feed < ActiveRecord::Base
 	has_many :subscriptions
 	has_many :subscribers, through: :subscriptions, source: :user
 
-	has_many :messages
+	has_many :messages, -> { order(sent_at: :desc) }
 
 	## Methods
 	def publish(message)
@@ -47,6 +47,7 @@ class Feed < ActiveRecord::Base
 
 		end
 	end
+
 
 	## Private Methods
     private
