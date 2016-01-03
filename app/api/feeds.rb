@@ -52,14 +52,14 @@ module API
 					optional :after_sequence, type: Integer, default: 0
 					optional :auth_token, type: String
 				end
-				get do
+				get :messages do
 
 					# find feed
 					feed = Feed.find_by id: params[:id]
 					not_found! '404.1', 'Feed was not found' unless feed
 
 					# get messages
-					messages = f.messages.after params[:after_sequence]
+					messages = feed.messages.after params[:after_sequence]
 
 					# limit to desired count
 					messages = messages.limit params[:count]

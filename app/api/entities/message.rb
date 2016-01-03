@@ -2,7 +2,11 @@ module API
 	module Entities
 		class Message < Grape::Entity
 
-			expose :id, :payload, :options, :message_type, :sent_at
+			expose :id, :feed_sequence, :payload, :message_type, :sent_at
+
+			expose :options do |message, opts|
+				message.options.to_hash
+			end
 
 			expose :sender, with: Entities::User
 

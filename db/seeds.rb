@@ -52,6 +52,7 @@ puts 'Creating devices...'
 User.all.each do |user|
 
 	device = Device.generate PROFILES.sample.merge({ user: user, uuid: SecureRandom.uuid })
+	puts device.token_hash
 	device.save!
 end
 
