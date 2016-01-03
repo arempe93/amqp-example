@@ -27,6 +27,9 @@ class Message < ActiveRecord::Base
 	belongs_to :feed
 	belongs_to :sender, class_name: 'User', foreign_key: 'user_id'
 
+	## Scopes
+	scope :after, lambda { |seq| where('feed_sequence > ?', seq) }
+
 	## Private Methods
 	private
 	def add_metadata

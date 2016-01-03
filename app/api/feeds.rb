@@ -45,6 +45,29 @@ module API
 					# show feed
 					present :feed, feed, show_recents: params[:show_recents]
 				end
+
+				desc 'Get messages in feed'
+				params do
+					optional :count, type: Integer, default: 20, values: 0..50
+					optional :after_sequence, type: Integer, default: 0
+					optional :auth_token, type: String
+				end
+				get do
+
+					# find feed
+					feed = Feed.find_by id: params[:id]
+					not_found! '404.1', 'Feed was not found' unless feed
+
+					# get messages
+					messages = f.messages.after params[:after_sequence]
+
+					# limit to desired count
+					messages = messages.limit params[:count]
+
+					# show messages
+					present :messages, messages, show_feed: false
+				end
+
 			end
 		end
 

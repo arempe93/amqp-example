@@ -25,7 +25,7 @@ class Feed < ActiveRecord::Base
 	has_many :subscriptions
 	has_many :subscribers, through: :subscriptions, source: :user
 
-	has_many :messages, -> { order(feed_sequence: :desc) }
+	has_many :messages, -> { order(feed_sequence: :asc) }
 
 	## Methods
 	def publish(message)
