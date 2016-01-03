@@ -40,28 +40,31 @@ class Message < ActiveRecord::Base
 		# add feed sequence
 		self.feed_sequence = self.feed.next_message_sequence
 
-		# add metadata
-		self.options = {
-			type: Enums::MessageType.t(self.message_type),
-			user_id: self.sender.id,
-			correlation_id: self.feed.id,
-			timestamp: self.sent_at.to_i
-		}
-
 		# continue creation
 		true
 	end
 
 	def publish
 
-		# add message id to metadata
-		self.options.merge! message_id: self.id
+		# gather rmq metadata
+		rmq_options = {
+			message_id: self.id,
+			type: Enums::MessageType.t(self.message_type),
+			correlation_id: self.feed.id,
+			timestamp: self.sent_at.to_i
+		}
+
+		# persist metadata
+		self.options = rmq_options
 		self.save!
+
+		# add additional info for rmq consumers
+		rmq_options.merge! headers: { sender_id: self.sender.id, feed_seq: self.feed_sequence }
 
 		begin
 
 			# publish message to exchange
-			AMQP::Factory.publish self.payload, self.feed.amqp_xchg, self.options
+			AMQP::Factory.publish self.payload, self.feed.amqp_xchg, rmq_options
 
 		rescue => e
 
