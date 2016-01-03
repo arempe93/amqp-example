@@ -5,6 +5,8 @@ module API
 			expose :id, :feed_sequence, :payload, :message_type, :sent_at
 
 			expose :options do |message, opts|
+
+				# grape doesnt know how to represent hstore directly
 				message.options.to_hash
 			end
 

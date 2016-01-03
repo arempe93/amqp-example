@@ -57,7 +57,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -86,7 +86,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -120,7 +120,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -150,7 +150,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -186,7 +186,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -215,7 +215,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 
@@ -248,7 +248,7 @@ module AMQP
             ensure
 
                 # close channel
-                channel.close
+                channel.close if channel
             end
         end
 

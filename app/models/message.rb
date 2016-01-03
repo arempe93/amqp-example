@@ -21,7 +21,7 @@ class Message < ActiveRecord::Base
 
 	## Callbacks
 	before_create :add_metadata
-	after_create :deliver
+	after_create :publish
 
 	## Relationships
 	belongs_to :feed
@@ -40,7 +40,7 @@ class Message < ActiveRecord::Base
 		# add feed sequence
 		self.feed_sequence = self.feed.next_message_sequence
 
-		# add some rmq options
+		# add metadata
 		self.options = {
 			type: Enums::MessageType.t(self.message_type),
 			user_id: self.sender.id,
@@ -52,13 +52,25 @@ class Message < ActiveRecord::Base
 		true
 	end
 
-	def deliver
+	def publish
 
-		# add message id to delivery options
+		# add message id to metadata
 		self.options.merge! message_id: self.id
 		self.save!
 
-		# tell feed to send me
-		self.feed.publish self
+		begin
+
+			# publish message to exchange
+			AMQP::Factory.publish self.payload, self.feed.amqp_xchg, self.options
+
+		rescue => e
+
+			# log error
+			Rails.logger.error "#<Message id:#{self.id}>.publish raised => #{e.class.name}: '#{e.message}'"
+            Rails.logger.error "#{e.backtrace}"
+
+			# bubble up call stack
+			raise
+		end
 	end
 end

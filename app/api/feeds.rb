@@ -46,28 +46,55 @@ module API
 					present :feed, feed, show_recents: params[:show_recents]
 				end
 
-				desc 'Get messages in feed'
-				params do
-					optional :count, type: Integer, default: 20, values: 0..50
-					optional :after_sequence, type: Integer, default: 0
-					optional :auth_token, type: String
+				resource :messages do
+
+					desc 'Send message in feed'
+					params do
+						requires :payload, type: String
+						optional :auth_token, type: String
+					end
+					post do
+
+						# find feed
+						feed = Feed.find_by id: params[:id]
+						not_found! '404.1', 'Feed was not found' unless feed
+
+						# check feed permission
+						forbidden! unless @user.subscribed_to?(feed)
+
+						# create message
+						message = feed.send! @user, params[:payload]
+
+						# return message
+						present :message, message, show_feed: false
+					end
+
+					desc 'Get messages in feed'
+					params do
+						optional :count, type: Integer, default: 20, values: 0..50
+						optional :after_sequence, type: Integer, default: 0
+						optional :auth_token, type: String
+					end
+					get do
+
+						# find feed
+						feed = Feed.find_by id: params[:id]
+						not_found! '404.1', 'Feed was not found' unless feed
+
+						# check feed permission
+						forbidden! unless @user.subscribed_to?(feed)
+
+						# get messages
+						messages = feed.messages.after params[:after_sequence]
+
+						# limit to desired count
+						messages = messages.limit params[:count]
+
+						# show messages
+						present :messages, messages, show_feed: false
+					end
+
 				end
-				get :messages do
-
-					# find feed
-					feed = Feed.find_by id: params[:id]
-					not_found! '404.1', 'Feed was not found' unless feed
-
-					# get messages
-					messages = feed.messages.after params[:after_sequence]
-
-					# limit to desired count
-					messages = messages.limit params[:count]
-
-					# show messages
-					present :messages, messages, show_feed: false
-				end
-
 			end
 		end
 

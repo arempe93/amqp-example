@@ -28,24 +28,9 @@ class Feed < ActiveRecord::Base
 	has_many :messages, -> { order(feed_sequence: :asc) }
 
 	## Methods
-	def publish(message)
+	def send!(sender, payload)
 
-		begin
-
-			# publish message to exchange
-			AMQP::Factory.publish message.payload, self.amqp_xchg, message.options
-
-		rescue => e
-
-			# log error
-			Rails.logger.error "#<Feed id:#{self.id}>.publish raised => '#{e.message}'"
-			Rails.logger.error "(#<Message id:#{message.id}>)"
-            Rails.logger.error "#{e.backtrace}"
-
-			# bubble up call stack
-			raise
-
-		end
+		self.messages.create! sender: sender, payload: payload, message_type: Enums::MessageType::CHAT
 	end
 
 	def next_message_sequence
