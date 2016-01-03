@@ -2,13 +2,14 @@
 #
 # Table name: messages
 #
-#  id           :integer          not null, primary key
-#  user_id      :integer
-#  feed_id      :integer
-#  message_type :integer
-#  payload      :string
-#  options      :hstore
-#  sent_at      :datetime
+#  id            :integer          not null, primary key
+#  user_id       :integer
+#  feed_id       :integer
+#  message_type  :integer
+#  payload       :string
+#  options       :hstore
+#  sent_at       :datetime
+#  feed_sequence :integer
 #
 # Indexes
 #

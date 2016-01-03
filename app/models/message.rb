@@ -2,13 +2,14 @@
 #
 # Table name: messages
 #
-#  id           :integer          not null, primary key
-#  user_id      :integer
-#  feed_id      :integer
-#  message_type :integer
-#  payload      :string
-#  options      :hstore
-#  sent_at      :datetime
+#  id            :integer          not null, primary key
+#  user_id       :integer
+#  feed_id       :integer
+#  feed_sequence :integer
+#  message_type  :integer
+#  payload       :string
+#  options       :hstore
+#  sent_at       :datetime
 #
 # Indexes
 #
@@ -19,6 +20,7 @@
 class Message < ActiveRecord::Base
 
 	## Callbacks
+	before_create :add_metadata
 	after_create :deliver
 
 	## Relationships
@@ -27,21 +29,30 @@ class Message < ActiveRecord::Base
 
 	## Private Methods
 	private
-	def deliver
+	def add_metadata
 
 		# create timestamp
 		self.sent_at = DateTime.now
 
-		# create message delivery opts
+		# add feed sequence
+		self.feed_sequence = self.feed.next_message_sequence
+
+		# add some rmq options
 		self.options = {
-			message_id: self.id,
 			type: Enums::MessageType.t(self.message_type),
 			user_id: self.sender.id,
 			correlation_id: self.feed.id,
 			timestamp: self.sent_at.to_i
 		}
 
-		# save message data
+		# continue creation
+		true
+	end
+
+	def deliver
+
+		# add message id to delivery options
+		self.options.merge! message_id: self.id
 		self.save!
 
 		# tell feed to send me

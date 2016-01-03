@@ -25,7 +25,7 @@ class Feed < ActiveRecord::Base
 	has_many :subscriptions
 	has_many :subscribers, through: :subscriptions, source: :user
 
-	has_many :messages, -> { order(sent_at: :desc) }
+	has_many :messages, -> { order(feed_sequence: :desc) }
 
 	## Methods
 	def publish(message)
@@ -48,6 +48,10 @@ class Feed < ActiveRecord::Base
 		end
 	end
 
+	def next_message_sequence
+
+		(messages.maximum(:feed_sequence) || 0) + 1
+	end
 
 	## Private Methods
     private
