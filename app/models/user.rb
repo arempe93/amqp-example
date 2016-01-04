@@ -47,6 +47,20 @@ class User < ActiveRecord::Base
     has_many :feeds, through: :subscriptions, source: :feed
 
     ## Methods
+    def subscribe!(feed)
+
+        self.subscriptions.create! feed: feed
+    end
+
+    def unsubscribe!(feed)
+
+        sub = self.subscriptions.find_by(feed_id: feed.id)
+
+        raise ActiveRecord::RecordNotFound unless sub
+
+        sub.destroy!
+    end
+
     def subscribed_to?(feed)
         self.subscriptions.exists? feed_id: feed.id
     end
