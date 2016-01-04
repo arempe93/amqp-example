@@ -19,7 +19,7 @@ class Feed < ActiveRecord::Base
     after_destroy :teardown_xchg
 
 	## Validations
-	validates :name, uniqueness: { case_sensitive: true }, format: { with: /\A(([a-z]|'|\.)+\s?)+\Z/i }
+	validates :name, uniqueness: { case_sensitive: true }, format: { with: /\A(.+\s?)+\Z/i }
 
 	## Relationships
 	has_many :subscriptions

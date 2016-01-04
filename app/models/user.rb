@@ -51,6 +51,13 @@ class User < ActiveRecord::Base
         self.subscriptions.exists? feed_id: feed.id
     end
 
+    def has_private_feed_with?(other)
+
+        private_feeds = self.feeds.where feed_type: Enums::FeedType::PRIVATE
+
+        Subscription.exists? feed_id: private_feeds, user_id: other.id
+    end
+
     ## Private Methods
     private
     def create_xhcg
