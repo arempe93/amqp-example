@@ -90,6 +90,23 @@ module API
 				end
 
 			end
+
+            resource :check do
+
+                desc 'Check username availability'
+                params do
+                    requires :username, type: String
+                end
+                get :username do
+
+                    # find user
+                    user = User.find_by username: params[:username]
+
+                    # show availability
+                    present :available, user.nil?
+                end
+
+            end
 		end
 	end
 end
