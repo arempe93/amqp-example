@@ -23,9 +23,6 @@ module API
 
 				if attrs[:type] == Enums::FeedType::GROUP
 
-					# check if feed name is taken
-					unprocessable! '422.1', 'Feed name is already taken' if Feed.exists?(name: attrs[:name])
-
 					# create feed
 					feed = Feed.new name: attrs[:name], feed_type: attrs[:type]
 
