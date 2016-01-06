@@ -27,15 +27,16 @@ class User < ActiveRecord::Base
 
     ## Devise
     devise :database_authenticatable, :registerable,
-        :recoverable, :trackable, :validatable
+        :recoverable, :trackable
 
     ## Callbacks
     after_create :create_xhcg
     after_destroy :teardown_xchg
 
     ## Validations
-    validates :username, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/ }
+    validates :username, presence: true, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/, allow_blank: false }
     validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i }
+    validates :password, presence: true, length: { minimum: 8 }
 
     ## Relationships
     has_many :devices

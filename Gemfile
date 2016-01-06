@@ -47,4 +47,7 @@ group :test do
 
     # Model factories
     gem 'factory_girl_rails', '~> 4.0'
+
+    # Mocking for RabbitMQ
+    gem 'bunny-mock'
 end

@@ -7,11 +7,10 @@ abort 'The Rails environment is running in production mode!' if Rails.env.produc
 require 'spec_helper'
 require 'rspec/rails'
 
-require_relative 'support/helpers'
-require_relative 'support/constants'
-require_relative 'support/fixtures'
-
 ActiveRecord::Migration.maintain_test_schema!
+
+require 'bunny-mock'
+AMQP::Factory.connection = BunnyMock.new.start
 
 RSpec.configure do |config|
 

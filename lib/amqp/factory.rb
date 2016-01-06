@@ -13,22 +13,22 @@ module AMQP
         def self.connect
 
             # create bunny rmq client
-            @connection = Bunny.new Global.amqp.to_hash
+            @@connection = Bunny.new Global.amqp.to_hash
 
             # make connection
-            @connection.start
+            @@connection.start
 
             # return connection
-            @connection
+            @@connection
         end
 
         def self.get_channel
 
             # make connection if not connected
-            connect unless defined?(@connection) and @connection.open?
+            connect unless defined?(@@connection) and @@connection.open?
 
             # get channel
-            @connection.channel
+            @@connection.channel
         end
 
         ####################################################

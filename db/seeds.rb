@@ -19,7 +19,7 @@ puts 'Creating users...'
 
 	name = Faker::Name.name
 
-	User.create! name: name, username: Faker::Internet.user_name(name, %w(. _ -)), email: Faker::Internet.safe_email(name), password: 'Password1'
+	User.create! name: name, username: Faker::Internet.user_name(name, %w(. _ -)), password: 'Password1'
 end
 
 puts '[x] Done'
