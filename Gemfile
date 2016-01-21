@@ -7,6 +7,9 @@ gem 'rails', '4.2.1'
 gem 'grape'
 gem 'grape-entity'
 
+# Rack CORS
+gem 'rack-cors', :require => 'rack/cors'
+
 # Swagger API doc
 gem 'grape-swagger'
 gem 'grape-swagger-rails'
