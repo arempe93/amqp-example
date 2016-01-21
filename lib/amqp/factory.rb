@@ -1,256 +1,256 @@
 require 'bunny'
 
 module AMQP
-    module Factory
+	module Factory
 
 		## Connection, can be mocked for tests
 		mattr_accessor :connection
 
-        ####################################################
-        #   Connection Management
-        ####################################################
+		####################################################
+		#	Connection Management
+		####################################################
 
-        def self.connect
+		def self.connect
 
-            # create bunny rmq client
-            @@connection = Bunny.new Global.amqp.to_hash
+			# create bunny rmq client
+			@@connection = Bunny.new Global.amqp.to_hash
 
-            # make connection
-            @@connection.start
+			# make connection
+			@@connection.start
 
-            # return connection
-            @@connection
-        end
+			# return connection
+			@@connection
+		end
 
-        def self.get_channel
+		def self.get_channel
 
-            # make connection if not connected
-            connect unless defined?(@@connection) and @@connection.open?
+			# make connection if not connected
+			connect unless @@connection and @@connection.open?
 
-            # get channel
-            @@connection.channel
-        end
+			# get channel
+			@@connection.channel
+		end
 
-        ####################################################
-        #   Exchange Management
-        ####################################################
+		####################################################
+		#	Exchange Management
+		####################################################
 
-        def self.create_exchange(name)
+		def self.create_exchange(name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # create exchange
-                channel.fanout name, durable: true
+				# create exchange
+				channel.fanout name, durable: true
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::create_exchange raised => '#{e.message}'"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::create_exchange raised => '#{e.message}'"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        def self.teardown_exchange(name)
+		def self.teardown_exchange(name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get exchange
-                xchg = channel.fanout name, durable: true
+				# get exchange
+				xchg = channel.fanout name, durable: true
 
-                # teardown exchange
-                xchg.delete
+				# teardown exchange
+				xchg.delete
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::teardown_exchange raised => '#{e.message}'"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::teardown_exchange raised => '#{e.message}'"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        ####################################################
-        #   Binding Management
-        ####################################################
+		####################################################
+		#	Binding Management
+		####################################################
 
-        def self.bind_exchange(source_name, receiver_name)
+		def self.bind_exchange(source_name, receiver_name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get receiver exchange
-                receiver = channel.fanout receiver_name, durable: true
+				# get receiver exchange
+				receiver = channel.fanout receiver_name, durable: true
 
-                # bind receiver to source
-                receiver.bind source_name
+				# bind receiver to source
+				receiver.bind source_name
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::bind_exchange raised => #{e.class.name}: '#{e.message}'"
-                Rails.logger.error "(#{source_name}, #{receiver_name})"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::bind_exchange raised => #{e.class.name}: '#{e.message}'"
+				Rails.logger.error "(#{source_name}, #{receiver_name})"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        def self.unbind_exchange(source_name, receiver_name)
+		def self.unbind_exchange(source_name, receiver_name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get receiver exchange
-                receiver = channel.fanout receiver_name, durable: true
+				# get receiver exchange
+				receiver = channel.fanout receiver_name, durable: true
 
-                # unbind receiver from source
-                receiver.unbind source_name
+				# unbind receiver from source
+				receiver.unbind source_name
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::unbind_exchange raised => '#{e.message}'"
-                Rails.logger.error "(#{source_name}, #{receiver_name})"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::unbind_exchange raised => '#{e.message}'"
+				Rails.logger.error "(#{source_name}, #{receiver_name})"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        ####################################################
-        #   Queue Management
-        ####################################################
+		####################################################
+		#	Queue Management
+		####################################################
 
-        def self.create_queue(name, xchg_name)
+		def self.create_queue(name, xchg_name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get exchange to create in
-                xchg = channel.fanout xchg_name,durable: true
+				# get exchange to create in
+				xchg = channel.fanout xchg_name,durable: true
 
-                # create queue
-                queue = channel.queue name
+				# create queue
+				queue = channel.queue name
 
-                # bind queue to exchange
-                queue.bind xchg
+				# bind queue to exchange
+				queue.bind xchg
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::create_queue raised => '#{e.message}'"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::create_queue raised => '#{e.message}'"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        def self.teardown_queue(name)
+		def self.teardown_queue(name)
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get queue
-                queue = channel.queue name
+				# get queue
+				queue = channel.queue name
 
-                # delete queue
-                queue.delete
+				# delete queue
+				queue.delete
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::teardown_queue raised => '#{e.message}'"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::teardown_queue raised => '#{e.message}'"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-        ####################################################
-        #   Message Processing
-        ####################################################
+		####################################################
+		#	Message Processing
+		####################################################
 
-        def self.publish(message, xchg_name, opts = {})
+		def self.publish(message, xchg_name, opts = {})
 
-            begin
+			begin
 
-                # get channel
-                channel = get_channel
+				# get channel
+				channel = get_channel
 
-                # get exchange
-                xchg = channel.fanout xchg_name, durable: true
+				# get exchange
+				xchg = channel.fanout xchg_name, durable: true
 
-                # publish message
-                xchg.publish message.to_json, opts
+				# publish message
+				xchg.publish message.to_json, opts
 
-            rescue => e
+			rescue => e
 
-                # log errors
-                Rails.logger.error "AMQP::Factory::publish raised => '#{e.message}'"
-                Rails.logger.error "#{e.backtrace}"
+				# log errors
+				Rails.logger.error "AMQP::Factory::publish raised => '#{e.message}'"
+				Rails.logger.error "#{e.backtrace}"
 
-                # bubble up call stack
-                raise
+				# bubble up call stack
+				raise
 
-            ensure
+			ensure
 
-                # close channel
-                channel.close if channel
-            end
-        end
+				# close channel
+				channel.close if channel
+			end
+		end
 
-    end
+	end
 end

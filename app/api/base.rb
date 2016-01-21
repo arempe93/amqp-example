@@ -8,7 +8,7 @@ module API
 		helpers Support::Auth
 
 		after_validation do
-		@user, @device = authenticate! if declared(params).key?(:auth_token)
+			@user, @device = authenticate! if declared(params).key?(:auth_token)
 		end
 
 		mount Auth

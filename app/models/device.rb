@@ -20,94 +20,109 @@
 
 class Device < ActiveRecord::Base
 
-    ## Callbacks
-    before_create :hash_access_token
-    before_create :discover_os
+	## Callbacks
+	before_create :set_initial_request
+	before_create :hash_access_token
+	before_create :discover_os
 
-    after_create :create_queue
-    after_destroy :teardown_queue
+	after_create :create_queue
+	after_destroy :teardown_queue
 
-    ## Validations
-    validates :uuid, format: { with: /\A([abcdef0-9]+\-?)+\Z/ }
+	## Validations
+	validates :uuid, format: { with: /\A([abcdef0-9]+\-?)+\Z/ }
 
-    ## Relationships
-    belongs_to :user
+	## Relationships
+	belongs_to :user
 
-    ## Class Methods
-    def self.generate(attrs = {})
+	## Methods
+	def update_last_request!
+		update_attribute :last_request, Time.now
+	end
 
-        # generate 24 byte random token
-        auth_token = SecureRandom.urlsafe_base64 24
+	## Class Methods
+	def self.generate(attrs = {})
 
-        # create new device
-        Device.new attrs.merge(token_hash: auth_token)
-    end
+		# generate 24 byte random token
+		auth_token = SecureRandom.urlsafe_base64 24
 
-    def self.authenticate!(token)
+		# create new device instance
+		Device.new attrs.merge(token_hash: auth_token)
+	end
 
-        # find device for token
-        Device.find_by! token_hash: Digest::SHA256.hexdigest(token)
-    end
+	def self.authenticate!(token)
 
-    ## Private Methods
-    private
-    def hash_access_token
+		# find device for token
+		Device.find_by! token_hash: Digest::SHA256.hexdigest(token)
+	end
 
-        # md5 hash the auth token
-        self.token_hash = Digest::SHA256.hexdigest self.token_hash
+	## Private Methods
+	private
+	def set_initial_request
+	
+		# set last request to current time on create
+		self.last_request = Time.now
 
-        # continue creation
-        true
-    end
+		# continue creation
+		true
+	end
 
-    def discover_os
+	def hash_access_token
 
-        # get os from user_agent
-        self.os = Enums::DeviceOS.from_user_agent self.user_agent
+		# md5 hash the auth token
+		self.token_hash = Digest::SHA256.hexdigest self.token_hash
 
-        # continue creation
-        true
-    end
+		# continue creation
+		true
+	end
 
-    def create_queue
+	def discover_os
 
-        # generate queue name
-        self.amqp_queue = "queue.device.#{self.id}.#{self.mobile}"
+		# get os from user_agent
+		self.os = Enums::DeviceOS.from_user_agent self.user_agent
 
-        begin
+		# continue creation
+		true
+	end
 
-            # bind to user exchange
-            AMQP::Factory.create_queue self.amqp_queue, self.user.amqp_xchg
+	def create_queue
 
-        rescue => e
+		# generate queue name
+		self.amqp_queue = "queue.device.#{self.id}.#{self.mobile}"
 
-            # log error
-            Rails.logger.error "Device.create_queue raised => '#{e.message}'"
-            Rails.logger.error "#{e.backtrace}"
+		begin
 
-            # bubble up call stack
-            raise
+			# bind to user exchange
+			AMQP::Factory.create_queue self.amqp_queue, self.user.amqp_xchg
 
-        else
+		rescue => e
 
-            # save queue name
-            self.save!
-        end
-    end
+			# log error
+			Rails.logger.error "Device.create_queue raised => '#{e.message}'"
+			Rails.logger.error "#{e.backtrace}"
 
-    def teardown_queue
+			# bubble up call stack
+			raise
 
-        begin
+		else
 
-            # remove from rmq
-            AMQP::Factory.teardown_queue self.amqp_queue
+			# save queue name
+			self.save!
+		end
+	end
 
-        rescue => e
+	def teardown_queue
 
-            # log error
-            Rails.logger.error "#<Device id:#{self.id}>.teardown_queue raised => '#{e.message}'"
-            Rails.logger.error "#{e.backtrace}"
+		begin
 
-        end
-    end
+			# remove from rmq
+			AMQP::Factory.teardown_queue self.amqp_queue
+
+		rescue => e
+
+			# log error
+			Rails.logger.error "#<Device id:#{self.id}>.teardown_queue raised => '#{e.message}'"
+			Rails.logger.error "#{e.backtrace}"
+
+		end
+	end
 end
