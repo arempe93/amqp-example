@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160106034413) do
+ActiveRecord::Schema.define(version: 20160122045403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,11 +32,13 @@ ActiveRecord::Schema.define(version: 20160106034413) do
   add_index "devices", ["user_id"], name: "index_devices_on_user_id", using: :btree
 
   create_table "feeds", force: :cascade do |t|
-    t.string  "name",      null: false
-    t.integer "feed_type", null: false
+    t.string  "name",       null: false
+    t.integer "feed_type",  null: false
     t.string  "amqp_xchg"
+    t.integer "creator_id"
   end
 
+  add_index "feeds", ["creator_id"], name: "index_feeds_on_creator_id", using: :btree
   add_index "feeds", ["name"], name: "index_feeds_on_name", unique: true, using: :btree
 
   create_table "messages", force: :cascade do |t|

@@ -70,7 +70,7 @@ puts 'Creating feeds...'
 5.times do
 
 	feed_type = Enums::FeedType.list.sample
-	feed = Feed.create! name: Faker::Lorem.sentence, feed_type: feed_type
+	feed = Feed.create! name: Faker::Lorem.sentence, feed_type: feed_type, creator: User.all.to_a.sample
 
 	if feed_type == Enums::FeedType::PRIVATE
 

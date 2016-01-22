@@ -25,92 +25,94 @@
 
 class User < ActiveRecord::Base
 
-    ## Devise
-    devise :database_authenticatable, :registerable,
-        :recoverable, :trackable
+	## Devise
+	devise :database_authenticatable, :registerable,
+		:recoverable, :trackable
 
-    ## Callbacks
-    after_create :create_xhcg
-    after_destroy :teardown_xchg
+	## Callbacks
+	after_create :create_xhcg
+	after_destroy :teardown_xchg
 
-    ## Validations
-    validates :username, presence: true, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/, allow_blank: false }
-    validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i }
-    validates :password, presence: true, length: { minimum: 8 }
+	## Validations
+	validates :username, presence: true, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/, allow_blank: false }
+	validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i }
+	validates :password, presence: true, length: { minimum: 8 }
 
-    ## Relationships
-    has_many :devices
+	## Relationships
+	has_many :devices
 
-    has_many :subscriptions
-    has_many :feeds, through: :subscriptions, source: :feed
+	has_many :subscriptions
+	has_many :feeds, through: :subscriptions, source: :feed
 
-    ## Methods
-    def subscribe!(feed)
+	has_many :created_feeds, class_name: 'Feed', foreign_key: :creator_id
 
-        self.subscriptions.create! feed: feed
-    end
+	## Methods
+	def subscribe!(feed)
 
-    def unsubscribe!(feed)
+		self.subscriptions.create! feed: feed
+	end
 
-        sub = self.subscriptions.find_by(feed_id: feed.id)
+	def unsubscribe!(feed)
 
-        raise ActiveRecord::RecordNotFound unless sub
+		sub = self.subscriptions.find_by(feed_id: feed.id)
 
-        sub.destroy!
-    end
+		raise ActiveRecord::RecordNotFound unless sub
 
-    def subscribed_to?(feed)
-        self.subscriptions.exists? feed_id: feed.id
-    end
+		sub.destroy!
+	end
 
-    def has_private_feed_with?(other)
+	def subscribed_to?(feed)
+		self.subscriptions.exists? feed_id: feed.id
+	end
 
-        private_feeds = self.feeds.where feed_type: Enums::FeedType::PRIVATE
+	def has_private_feed_with?(other)
 
-        Subscription.exists? feed_id: private_feeds, user_id: other.id
-    end
+		private_feeds = self.feeds.where feed_type: Enums::FeedType::PRIVATE
 
-    ## Private Methods
-    private
-    def create_xhcg
+		Subscription.exists? feed_id: private_feeds, user_id: other.id
+	end
 
-        # generate exchange name
-        self.amqp_xchg = "xchg.user.#{self.id}"
+	## Private Methods
+	private
+	def create_xhcg
 
-        begin
+		# generate exchange name
+		self.amqp_xchg = "xchg.user.#{self.id}"
 
-            # create in rmq
-            AMQP::Factory.create_exchange self.amqp_xchg
+		begin
 
-        rescue => e
+			# create in rmq
+			AMQP::Factory.create_exchange self.amqp_xchg
 
-            # log error
-            Rails.logger.error "#<User id:#{self.id}>.create_xchg raised => '#{e.message}'"
-            Rails.logger.error "#{e.backtrace}"
+		rescue => e
 
-            # bubble up call stack
-            raise
+			# log error
+			Rails.logger.error "#<User id:#{self.id}>.create_xchg raised => '#{e.message}'"
+			Rails.logger.error "#{e.backtrace}"
 
-        else
+			# bubble up call stack
+			raise
 
-            # save exchange name
-            self.save!
-        end
-    end
+		else
 
-    def teardown_xchg
+			# save exchange name
+			self.save!
+		end
+	end
 
-        begin
+	def teardown_xchg
 
-            # remove from rmq
-            AMQP::Factory.teardown_exchange self.amqp_xchg
+		begin
 
-        rescue => e
+			# remove from rmq
+			AMQP::Factory.teardown_exchange self.amqp_xchg
 
-            # log error
-            Rails.logger.error "#<User id:#{self.id}>.teardown_xchg raised => '#{e.message}'"
-            Rails.logger.error "#{e.backtrace}"
+		rescue => e
 
-        end
-    end
+			# log error
+			Rails.logger.error "#<User id:#{self.id}>.teardown_xchg raised => '#{e.message}'"
+			Rails.logger.error "#{e.backtrace}"
+
+		end
+	end
 end

@@ -27,7 +27,7 @@ module API
 				if attrs[:type] == Enums::FeedType::GROUP
 
 					# create feed
-					feed = Feed.new name: attrs[:name], feed_type: attrs[:type]
+					feed = Feed.new name: attrs[:name], feed_type: attrs[:type], creator: @user
 
 				else
 
@@ -42,7 +42,7 @@ module API
 					unprocessable! '422.2', 'Private feed between users already exists' if @user.has_private_feed_with?(user)
 
 					# create feed
-					feed = Feed.new name: "Private Chat: #{@user.username} - #{user.username}", feed_type: attrs[:type]
+					feed = Feed.new name: "Private Chat: #{@user.username} - #{user.username}", feed_type: attrs[:type], creator: @user
 
 					# subscribe other user
 					subscribers << user
@@ -125,6 +125,9 @@ module API
 				put do
 
 					attrs = set(params)
+
+					# only allow feed creator to edit
+					forbidden! unless @feed.creator == @user
 
 					# dont allow editing private groups
 					unprocessable! '422.1', 'Cannot edit private feed information' if @feed.private?
