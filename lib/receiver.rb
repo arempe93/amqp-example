@@ -5,7 +5,7 @@ topic = ARGV.shift
 conn = Bunny.new
 conn.start
 
-queue = conn.channel.queue topic
+queue = conn.channel.queue topic, durable: true
 
 puts "[x] Connected to #{topic}\n"
 
