@@ -166,10 +166,10 @@ module AMQP
 				channel = get_channel
 
 				# get exchange to create in
-				xchg = channel.fanout xchg_name,durable: true
+				xchg = channel.fanout xchg_name, durable: true
 
 				# create queue
-				queue = channel.queue name
+				queue = channel.queue name, durable: true
 
 				# bind queue to exchange
 				queue.bind xchg
@@ -198,7 +198,7 @@ module AMQP
 				channel = get_channel
 
 				# get queue
-				queue = channel.queue name
+				queue = channel.queue name, durable: true
 
 				# delete queue
 				queue.delete
