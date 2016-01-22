@@ -6,6 +6,7 @@ module API
 
 		helpers Support::Errors
 		helpers Support::Auth
+		helpers Support::Helpers
 
 		after_validation do
 			@user, @device = authenticate! if declared(params).key?(:auth_token)

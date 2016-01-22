@@ -16,10 +16,13 @@ module API
 			post do
 
 				# filter out nil params
-				attrs = declared(params).compact.symbolize_keys
+				attrs = set(params)
 
-				# create array of subscriptions we will need to make after feed is saved
-				subscriptions = []
+				# create array of subscribers to add to feed
+				subscribers = []
+
+				# add self as a subscriber
+				subscribers << @user
 
 				if attrs[:type] == Enums::FeedType::GROUP
 
@@ -42,25 +45,24 @@ module API
 					feed = Feed.new name: "Private Chat: #{@user.username} - #{user.username}", feed_type: attrs[:type]
 
 					# subscribe other user
-					subscriptions << Subscription.new(feed: feed, user: user)
+					subscribers << user
 				end
 
-				# add self as a subscriber
-				subscriptions << Subscription.new(feed: feed, user: @user)
+				# validate feed
+				unprocessable! '422.3', feed.errors.full_messages.join(', ') unless feed.valid?
 
 				begin
 
-					# save feed
-					feed.save!
+					ActiveRecord::Base.transaction do
 
-					# save all needed subscriptions
-					subscriptions.each do |sub|
-						sub.save!
+						# save feed
+						feed.save!
+
+						# save all subscriptions
+						subscribers.each do |user|
+							user.subscribe! feed
+						end
 					end
-
-				rescue ActiveRecord::RecordInvalid => e
-
-					unprocessable! '422.3', e.message
 
 				rescue => e
 

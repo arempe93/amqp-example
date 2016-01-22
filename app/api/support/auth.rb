@@ -22,7 +22,7 @@ module API
 					# return user with requesting device
 					[ device.user, device ]
 
-				rescue => e
+				rescue ActiveRecord::RecordNotFound => e
 
 					unauthorized! '401.1', 'Token is missing or invalid'
 				end
