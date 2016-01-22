@@ -49,12 +49,16 @@ PROFILES = [
 
 puts 'Creating devices...'
 
+tokens = []
+
 User.all.each do |user|
 
 	device = Device.generate PROFILES.sample.merge({ user: user, uuid: SecureRandom.uuid })
-	puts device.token_hash
+	tokens << device.token_hash
 	device.save!
 end
+
+File.write "#{Rails.root}/devices.txt", tokens.join("\n")
 
 puts '[x] Done'
 
