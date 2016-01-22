@@ -7,6 +7,10 @@ module API
 				declared(params).to_hash.compact.deep_symbolize_keys
 			end
 
+			def validate!(model, code = '422')
+				unprocessable! code, "#{model.class.name}: #{model.errors.full_messages.join(', ')}" unless model.valid?
+			end
+
 		end
 	end
 end

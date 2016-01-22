@@ -49,7 +49,7 @@ module API
 				end
 
 				# validate feed
-				unprocessable! '422.3', feed.errors.full_messages.join(', ') unless feed.valid?
+				validate! feed, '422.1'
 
 				begin
 

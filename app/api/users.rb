@@ -1,57 +1,61 @@
 module API
-    class Users < Grape::API
+	class Users < Grape::API
 
 		represent User, with: API::Entities::User
-        represent Device, with: API::Entities::Device
+		represent Device, with: API::Entities::Device
 
 		resource :users do
 
 			desc 'Sign up a new user'
 			params do
-				requires :email, type: String
-				requires :password, type: String
 				requires :username, type: String
+				requires :password, type: String
 				optional :name, type: String
 
-				group :device, type: Hash do
-                    requires :uuid, type: String
-                    requires :user_agent, type: String
-                    optional :mobile, type: Boolean, default: false
-                end
+				requires :device, type: Hash do
+					requires :uuid, type: String
+					requires :user_agent, type: String
+					optional :mobile, type: Boolean, default: false
+				end
 			end
 			post do
 
 				# create user
-				user = User.new email: params[:email], password: params[:password], username: params[:username], name: params[:name]
+				user = User.new username: params[:username], password: params[:password], name: params[:name]
+
+				# validate user
+				validate! user, '422.1'
 
 				# create device
-                device = Device.generate params[:device].to_hash.merge({ user: user })
+				device = Device.generate params[:device].to_hash.merge({ user: user })
 
-                # get un-hashed auth token
-                auth_token = device.token_hash
+				# validate device
+				validate! device, '422.2'
 
-                begin
+				# get un-hashed auth token
+				auth_token = device.token_hash
 
-					# save user
-					user.save!
+				begin
 
-                    # save new device
-                    device.save!
+					ActiveRecord::Base.transaction do
 
-				rescue ActiveRecord::ActiveRecordError => e
+						# save user
+						user.save!
 
-					unprocessable '422.1', e.message
+						# save new device
+						device.save!
+					end
 
-                rescue => e
+				rescue => e
 
-                    server_error! '500.1', e.message
+					server_error! '500.1', e.message
 
-                else
+				else
 
-                    # present token and user
-                    present :auth_token, auth_token
-                    present :device, device
-                end
+					# present token and user
+					present :auth_token, auth_token
+					present :device, device
+				end
 			end
 
 			desc 'Search users to chat with'
@@ -108,22 +112,22 @@ module API
 
 			end
 
-            resource :check do
+			resource :check do
 
-                desc 'Check username availability'
-                params do
-                    requires :username, type: String
-                end
-                get :username do
+				desc 'Check username availability'
+				params do
+					requires :username, type: String
+				end
+				get :username do
 
-                    # find user
-                    user = User.find_by username: params[:username]
+					# find user
+					user = User.find_by username: params[:username]
 
-                    # show availability
-                    present :available, user.nil?
-                end
+					# show availability
+					present :available, user.nil?
+				end
 
-            end
+			end
 		end
 	end
 end

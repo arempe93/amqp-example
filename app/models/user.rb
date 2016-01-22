@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
 
 	## Validations
 	validates :username, presence: true, uniqueness: { case_sensitive: true }, format: { with: /\A(?![_\-.])([\w\.-]{3,30})(?<![_.])\Z/, allow_blank: false }
-	validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i }
+	validates :name, format: { with: /\A(([a-z]|'|\.)+\s?){1,4}\Z/i, allow_blank: true }
 	validates :password, presence: true, length: { minimum: 8 }
 
 	## Relationships

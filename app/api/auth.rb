@@ -29,6 +29,9 @@ module API
 				# create device
 				device = Device.generate params[:device].to_hash.merge({ user: user })
 
+				# validate device
+				validate! device, '422.1'
+
 				# get un-hashed auth token
 				auth_token = device.token_hash
 
