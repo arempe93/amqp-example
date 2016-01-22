@@ -89,6 +89,23 @@ module API
 					present :user, user
 				end
 
+				desc 'Get users feeds'
+				params do
+					optional :auth_token, type: String
+				end
+				get :feeds do
+
+					# find user
+					user = User.find_by id: params[:id]
+					not_found! '404.1', 'User was not found' unless user
+
+					# ensure requester matches user
+					forbidden! unless @user == user
+
+					# show users feeds
+					present :feeds, user.feeds, show_recents: true
+				end
+
 			end
 
             resource :check do

@@ -35,8 +35,16 @@ class Feed < ActiveRecord::Base
 
 	def next_message_sequence
 
-		(messages.maximum(:feed_sequence) || 0) + 1
+		(self.messages.maximum(:feed_sequence) || 0) + 1
 	end
+
+    def private?
+        self.feed_type = Enums::FeedType::PRIVATE
+    end
+
+    def group?
+        self.feed_type = Enums::FeedType::GROUP
+    end
 
 	## Private Methods
     private

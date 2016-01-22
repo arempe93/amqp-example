@@ -97,6 +97,16 @@ module API
 
 			route_param :id do
 
+				after_validation do
+
+					# find feed
+					@feed = Feed.find_by id: params[:id]
+					not_found! '404.1', 'Feed was not found' unless @feed
+
+					# check feed permission
+					forbidden! unless @user.subscribed_to?(@feed)
+				end
+
 				desc 'Get feed information'
 				params do
 					optional :show_recents, type: Boolean, default: false
@@ -104,15 +114,60 @@ module API
 				end
 				get do
 
-					# find feed
-					feed = Feed.find_by id: params[:id]
-					not_found! '404.1', 'Feed was not found' unless feed
+					# show feed
+					present :feed, @feed, show_recents: params[:show_recents]
+				end
 
-					# check feed permission
-					forbidden! unless @user.subscribed_to?(feed)
+				desc 'Update feed information'
+				params do
+					optional :name, type: String
+				end
+				put do
+
+					attrs = set(params)
+
+					# dont allow editing private groups
+					unprocessable! '422.1', 'Cannot edit private feed information' if @feed.private?
+
+					# update feed
+					@feed.update_attributes attrs
 
 					# show feed
-					present :feed, feed, show_recents: params[:show_recents]
+					present :feed, @feed
+				end
+
+				desc 'Subscribe to a feed'
+				params do
+					optional :auth_token, type: String
+				end
+				post :subscribe do
+
+					# subscribe
+					@user.subscribe! @feed
+
+					# show updated feed
+					present :feed, @feed
+				end
+
+				desc 'Unsubscribe from a feed'
+				params do
+					optional :auth_token, type: String
+				end
+				delete :unsubscribe do
+
+					begin
+
+						# subscribe
+						@user.unsubscribe! @feed
+
+					rescue ActiveRecord::RecordNotFound => e
+
+						# user was not subscribed
+						not_found! '404.2', e.message
+					end
+
+					# show updated feed
+					present :feed, @feed
 				end
 
 				resource :messages do
@@ -124,15 +179,8 @@ module API
 					end
 					post do
 
-						# find feed
-						feed = Feed.find_by id: params[:id]
-						not_found! '404.1', 'Feed was not found' unless feed
-
-						# check feed permission
-						forbidden! unless @user.subscribed_to?(feed)
-
 						# create message
-						message = feed.send! @user, params[:payload]
+						message = @feed.send! @user, params[:payload]
 
 						# return message
 						present :message, message, show_feed: false
@@ -146,15 +194,8 @@ module API
 					end
 					get do
 
-						# find feed
-						feed = Feed.find_by id: params[:id]
-						not_found! '404.1', 'Feed was not found' unless feed
-
-						# check feed permission
-						forbidden! unless @user.subscribed_to?(feed)
-
 						# get messages
-						messages = feed.messages.after params[:after_sequence]
+						messages = @feed.messages.after params[:after_sequence]
 
 						# limit to desired count
 						messages = messages.limit params[:count]
@@ -164,29 +205,6 @@ module API
 					end
 
 				end
-			end
-		end
-
-		resource :users do
-			route_param :id do
-
-				desc 'Get users feeds'
-				params do
-					optional :auth_token, type: String
-				end
-				get :feeds do
-
-					# find user
-					user = User.find_by id: params[:id]
-					not_found! '404.1', 'User was not found' unless user
-
-					# ensure requester matches user
-					forbidden! unless @user == user
-
-					# show users feeds
-					present :feeds, user.feeds, show_recents: true
-				end
-
 			end
 		end
 	end
