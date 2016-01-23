@@ -1,6 +1,8 @@
 module API
 	class Base < Grape::API
 
+		use Middleware::ErrorHandler
+
 		prefix :api
 		format :json
 

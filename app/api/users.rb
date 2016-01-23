@@ -65,6 +65,8 @@ module API
 			end
 			get do
 
+				raise 'O boy I am not good at computer'
+
 				# normalize query
 				query = params[:query].downcase
 
