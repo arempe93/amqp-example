@@ -65,8 +65,6 @@ module API
 			end
 			get do
 
-				raise 'oboy'
-
 				# normalize query
 				query = params[:query].downcase
 
