@@ -29,6 +29,9 @@ gem 'bunny'
 # Global configs
 gem 'global'
 
+# Colored logging
+gem 'shog'
+
 group :development, :test do
 
   # Spring

@@ -53,6 +53,7 @@ GEM
       amq-protocol (>= 2.0.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
+    colored (1.2)
     concurrent-ruby (1.0.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -171,6 +172,9 @@ GEM
       rspec-mocks (~> 3.4.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
+    shog (0.1.6)
+      colored (~> 1.2)
+      rails (~> 4.0)
     spring (1.6.1)
     sprockets (3.5.2)
       concurrent-ruby (~> 1.0)
@@ -213,6 +217,7 @@ DEPENDENCIES
   rails (= 4.2.1)
   rspec
   rspec-rails
+  shog
   spring
 
 BUNDLED WITH
