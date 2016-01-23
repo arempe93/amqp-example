@@ -13,8 +13,8 @@ module Middleware
 
 			rescue => e
 				
-				Rails.logger.error e.message
-				Rails.logger.error e.backtrace.join("\n\t")
+				Rails.logger.error "API ERROR: #{e.message}"
+				Rails.logger.error "API ERROR: #{e.backtrace.join("\n\t")}"
 
 				# rescue from uncaught exceptions
 				catch_error e

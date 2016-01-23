@@ -5,8 +5,13 @@ Shog.configure do
 		timestamp
 	end
 
-	match /REQUEST|QUERY/ do |msg, matches|
+	match /REQUEST|QUERY|POST\sPARAMS/ do |msg, _|
 
-		msg.green
+		msg.green.bold
+	end
+
+	match /API\sERROR/ do |msg, _|
+
+		msg.red.bold
 	end
 end
