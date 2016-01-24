@@ -145,6 +145,9 @@ module API
 				end
 				post :subscribe do
 
+					# dont allow subscriptions to private feeds
+					unprocessable! '422.1', 'Cannot subscribe to a private feed' if @feed.private?
+
 					# subscribe
 					@user.subscribe! @feed
 
@@ -157,6 +160,9 @@ module API
 					optional :auth_token, type: String
 				end
 				delete :unsubscribe do
+
+					# dont allow unsubscriptions from private feeds
+					unprocessable! '422.1', 'Cannot unsubscribe from a private feed' if @feed.private?
 
 					begin
 
